@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>打砖块</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="header">
+      <h1>打砖块</h1>
+      <div id="hud">
+        <span id="score-display">分数: 0</span>
+        <span id="lives-display">生命: 3</span>
+        <span id="level-display">关卡: 1</span>
+      </div>
+    </div>
+    <div id="game-wrapper">
+      <canvas id="game-canvas"></canvas>
+      <div id="overlay" class="show">
+        <div id="overlay-content">
+          <h2 id="overlay-title">打砖块</h2>
+          <p id="overlay-msg">点击「开始游戏」或按空格键开始</p>
+          <button id="action-btn">开始游戏</button>
+        </div>
+      </div>
+    </div>
+    <div id="controls">
+      <button id="pause-btn" disabled>暂停</button>
+      <button id="restart-btn">重新开始</button>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
