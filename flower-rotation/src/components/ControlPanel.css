@@ -1,0 +1,59 @@
+.control-panel {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(16px);
+}
+
+.control-panel .ant-card-head {
+  color: rgba(255, 255, 255, 0.85);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.control-panel .ant-card-head-title {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.control-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.control-row label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+}
+
+.control-actions {
+  flex-direction: row !important;
+}
+
+.speed-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+/* Ant Design overrides for dark theme */
+.control-panel .ant-select-selector {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.control-panel .ant-select-arrow {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.control-panel .ant-slider-rail {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.control-panel .ant-slider-track {
+  background: #7c3aed !important;
+}
+
+.control-panel .ant-slider-handle::after {
+  box-shadow: 0 0 0 2px #7c3aed !important;
+}

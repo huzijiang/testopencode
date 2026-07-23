@@ -1,0 +1,67 @@
+.flower-gallery .ant-drawer-content-wrapper {
+  background: rgba(13, 13, 43, 0.96) !important;
+}
+
+.flower-gallery .ant-drawer-header {
+  background: transparent !important;
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.flower-gallery .ant-drawer-title {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.flower-gallery .ant-drawer-close {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.flower-gallery .ant-drawer-body {
+  background: transparent;
+}
+
+.gallery-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.gallery-card:hover {
+  border-color: rgba(124, 58, 237, 0.4) !important;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15);
+}
+
+.gallery-card.selected {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.3);
+}
+
+.gallery-card .ant-card-body {
+  padding: 10px 12px;
+}
+
+.gallery-card .ant-card-cover {
+  height: 100px;
+}
+
+.gallery-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  opacity: 0.85;
+}
+
+.gallery-name {
+  display: block;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+}
+
+.gallery-meta {
+  display: block;
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 0.8rem;
+}

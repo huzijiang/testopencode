@@ -1,0 +1,54 @@
+.app {
+  position: relative;
+  min-height: 100vh;
+  color: #fff;
+  padding: 0 16px 40px;
+}
+
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at 30% 20%, #1a1a3e 0%, #0d0d2b 50%, #070714 100%);
+}
+
+.app-header {
+  text-align: center;
+  padding: 40px 0 20px;
+}
+
+.app-title {
+  color: #fff !important;
+  font-size: clamp(1.8rem, 5vw, 2.8rem) !important;
+  margin-bottom: 4px !important;
+  letter-spacing: 2px;
+}
+
+.app-subtitle {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: clamp(0.85rem, 2vw, 1.05rem);
+}
+
+.app-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+.error-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  background: rgba(255, 77, 79, 0.1);
+  border: 1px solid rgba(255, 77, 79, 0.3);
+  border-radius: 16px;
+  color: #ff4d4f;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 24px 0 12px;
+  }
+}
