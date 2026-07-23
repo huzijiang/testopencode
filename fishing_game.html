@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>钓鱼小游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #87CEEB, #4682B4);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 50%, #1E90FF 50%, #000080 100%);
+            border: 3px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .water-surface {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            top: 50%;
+            background: rgba(0, 100, 200, 0.6);
+            border-top: 3px solid #fff;
+        }
+
+        .boat {
+            position: absolute;
+            width: 120px;
+            height: 40px;
+            background: #8B4513;
+            top: 45%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 5px 5px 20px 20px;
+        }
+
+        .fishing-pole {
+            position: absolute;
+            width: 10px;
+            height: 100px;
+            background: #4a4a4a;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            transform-origin: bottom center;
+        }
+
+        .fishing-line {
+            position: absolute;
+            width: 2px;
+            height: 0;
+            background: #333;
+            top: 45%;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: height 0.3s ease-out;
+        }
+
+        .hook {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #333;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(45deg);
+            top: 45%;
+            left: 50%;
+            margin-left: -10px;
+            opacity: 0;
+            transition: all 0.3s ease-out;
+        }
+
+        .fish {
+            position: absolute;
+            width: 60px;
+            height: 30px;
+            background: #FFD700;
+            border-radius: 50%;
+            transition: all 0.1s linear;
+        }
+
+        .fish::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 20px solid #FFD700;
+            right: -20px;
+            top: 0;
+        }
+
+        .fish::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
+            top: 8px;
+            left: 15px;
+        }
+
+        .score-board {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .catch-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .catch-btn:hover {
+            background: #45a049;
+        }
+
+        .catch-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .catched-fish {
+            position: absolute;
+            background: #FFD700;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="water-surface"></div>
+        <div class="boat"></div>
+        <div class="fishing-pole"></div>
+        <div class="fishing-line" id="fishingLine"></div>
+        <div class="hook" id="hook"></div>
+        <div class="score-board">
+            <div>得分: <span id="score">0</span></div>
+            <div>时间: <span id="time">60</span>秒</div>
+            <div>钓到: <span id="caught">0</span>条</div>
+        </div>
+        <div id="fishContainer"></div>
+    </div>
+
+    <div class="instructions">
+        <h2>钓鱼小游戏</h2>
+        <p>点击"下钩"按钮将鱼钩放入水中，当鱼钩碰到鱼时即可钓到鱼！</p>
+        <p>不同的鱼有不同的得分，金色鱼值10分，红色鱼值20分，蓝色鱼值30分。</p>
+        <div class="controls">
+            <button class="control-btn catch-btn" id="dropHook">下钩</button>
+            <button class="control-btn catch-btn" id="pullHook" disabled>收杆</button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏状态
+        const gameState = {
+            score: 0,
+            time: 60,
+            caught: 0,
+            isHooking: false,
+            hookInWater: false,
+            fishList: [],
+            gameActive: true
+        };
+
+        // DOM元素
+        const fishingLine = document.getElementById('fishingLine');
+        const hook = document.getElementById('hook');
+        const fishContainer = document.getElementById('fishContainer');
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const caughtDisplay = document.getElementById('caught');
+        const dropHookBtn = document.getElementById('dropHook');
+        const pullHookBtn = document.getElementById('pullHook');
+
+        // 初始化游戏
+        function initGame() {
+            // 创建初始鱼群
+            for (let i = 0; i < 5; i++) {
+                createFish();
+            }
+
+            // 设置事件监听
+            dropHookBtn.addEventListener('click', dropHook);
+            pullHookBtn.addEventListener('click', pullHook);
+
+            // 开始游戏循环
+            gameLoop();
+            startTimer();
+        }
+
+        // 创建鱼
+        function createFish() {
+            const fish = document.createElement('div');
+            fish.className = 'fish';
+            
+            // 随机鱼的类型和颜色
+            const fishTypes = [
+                { color: '#FFD700', points: 10 },  // 金色鱼
+                { color: '#FF4500', points: 20 },  // 红色鱼
+                { color: '#1E90FF', points: 30 }   // 蓝色鱼
+            ];
+            
+            const fishType = fishTypes[Math.floor(Math.random() * fishTypes.length)];
+            fish.style.backgroundColor = fishType.color;
+            fish.dataset.points = fishType.points;
+            
+            // 随机位置
+            const yPos = 60 + Math.random() * 200; // 水下区域
+            fish.style.top = yPos + 'px';
+            fish.style.left = -60 + 'px'; // 从左侧开始
+            
+            // 随机速度
+            const speed = 1 + Math.random() * 2;
+            fish.dataset.speed = speed;
+            
+            fishContainer.appendChild(fish);
+            gameState.fishList.push(fish);
+            
+            return fish;
+        }
+
+        // 下钩
+        function dropHook() {
+            if (gameState.isHooking || !gameState.gameActive) return;
+            
+            gameState.isHooking = true;
+            gameState.hookInWater = true;
+            
+            // 显示鱼钩
+            hook.style.opacity = '1';
+            
+            // 放下鱼线
+            fishingLine.style.height = '200px';
+            hook.style.top = '70%';
+            
+            // 禁用下钩按钮，启用收杆按钮
+            dropHookBtn.disabled = true;
+            pullHookBtn.disabled = false;
+            
+            // 检查是否钓到鱼
+            checkForCatch();
+        }
+
+        // 收杆
+        function pullHook() {
+            if (!gameState.hookInWater) return;
+            
+            gameState.hookInWater = false;
+            gameState.isHooking = false;
+            
+            // 收回鱼钩
+            fishingLine.style.height = '0';
+            hook.style.top = '45%';
+            hook.style.opacity = '0';
+            
+            // 启用下钩按钮，禁用收杆按钮
+            dropHookBtn.disabled = false;
+            pullHookBtn.disabled = true;
+        }
+
+        // 检查是否钓到鱼
+        function checkForCatch() {
+            if (!gameState.hookInWater) return;
+            
+            const hookRect = hook.getBoundingClientRect();
+            
+            for (let i = 0; i < gameState.fishList.length; i++) {
+                const fish = gameState.fishList[i];
+                const fishRect = fish.getBoundingClientRect();
+                
+                if (isColliding(hookRect, fishRect)) {
+                    // 钓到鱼了！
+                    catchFish(fish, i);
+                    break;
+                }
+            }
+            
+            // 继续检测
+            if (gameState.hookInWater) {
+                requestAnimationFrame(checkForCatch);
+            }
+        }
+
+        // 检查碰撞
+        function isColliding(rect1, rect2) {
+            return !(rect1.right < rect2.left || 
+                     rect1.left > rect2.right || 
+                     rect1.bottom < rect2.top || 
+                     rect1.top > rect2.bottom);
+        }
+
+        // 钓到鱼
+        function catchFish(fish, index) {
+            const points = parseInt(fish.dataset.points);
+            
+            // 更新分数
+            gameState.score += points;
+            gameState.caught++;
+            
+            // 更新显示
+            scoreDisplay.textContent = gameState.score;
+            caughtDisplay.textContent = gameState.caught;
+            
+            // 创建钓到鱼的动画
+            const caughtFish = document.createElement('div');
+            caughtFish.className = 'catched-fish';
+            caughtFish.textContent = `+${points}分`;
+            caughtFish.style.left = fish.style.left;
+            caughtFish.style.top = fish.style.top;
+            fishContainer.appendChild(caughtFish);
+            
+            // 移除鱼
+            fish.remove();
+            gameState.fishList.splice(index, 1);
+            
+            // 动画效果
+            let opacity = 1;
+            const fadeInterval = setInterval(() => {
+                opacity -= 0.05;
+                caughtFish.style.opacity = opacity;
+                caughtFish.style.top = (parseInt(caughtFish.style.top) - 2) + 'px';
+                
+                if (opacity <= 0) {
+                    clearInterval(fadeInterval);
+                    caughtFish.remove();
+                }
+            }, 50);
+            
+            // 自动收杆
+            pullHook();
+            
+            // 生成新鱼
+            setTimeout(createFish, 1000);
+        }
+
+        // 更新鱼的位置
+        function updateFish() {
+            gameState.fishList.forEach(fish => {
+                let left = parseInt(fish.style.left) || 0;
+                const speed = parseFloat(fish.dataset.speed);
+                
+                left += speed;
+                
+                // 如果鱼游出屏幕，重新生成
+                if (left > 850) {
+                    fish.style.left = -60 + 'px';
+                    const yPos = 60 + Math.random() * 200;
+                    fish.style.top = yPos + 'px';
+                } else {
+                    fish.style.left = left + 'px';
+                }
+            });
+        }
+
+        // 游戏主循环
+        function gameLoop() {
+            if (!gameState.gameActive) return;
+            
+            updateFish();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 计时器
+        function startTimer() {
+            const timerInterval = setInterval(() => {
+                gameState.time--;
+                timeDisplay.textContent = gameState.time;
+                
+                if (gameState.time <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // 游戏结束
+        function endGame() {
+            gameState.gameActive = false;
+            alert(`游戏结束！\n得分: ${gameState.score}\n钓到: ${gameState.caught}条鱼`);
+            
+            // 重置游戏
+            resetGame();
+        }
+
+        // 重置游戏
+        function resetGame() {
+            gameState.score = 0;
+            gameState.time = 60;
+            gameState.caught = 0;
+            gameState.isHooking = false;
+            gameState.hookInWater = false;
+            gameState.gameActive = true;
+            
+            // 清空鱼
+            fishContainer.innerHTML = '';
+            gameState.fishList = [];
+            
+            // 重置显示
+            scoreDisplay.textContent = '0';
+            timeDisplay.textContent = '60';
+            caughtDisplay.textContent = '0';
+            
+            // 重置鱼钩
+            pullHook();
+            
+            // 重新初始化
+            initGame();
+        }
+
+        // 启动游戏
+        window.onload = initGame;
+    </script>
+</body>
+</html>
